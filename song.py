@@ -42,6 +42,11 @@ class Song:
     self.ctx.voice_client.stop()
     self.songState = self.SongState.END
 
+  def resetPlaying(self):
+    self.ctx.voice_client.stop()
+    print("Resetting song with url: ", self.url)
+    self.songState = self.SongState.END
+
 
   def setLoop(self, isLooped):
     self.isLooped = isLooped

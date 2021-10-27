@@ -1,6 +1,8 @@
 from song import Song
 from threading import Thread
 
+
+
 import time
 
 
@@ -25,14 +27,57 @@ class Scheduler(Thread):
   def shuffleQueue():
     pass
 
-  def playPreviousSong(self):
-    if (self.previousSong != None):
-      currentSong = self.getCurrentSong()
+  def getPreviousSong(self):
+    return self.previousSong
+
+
+########################
+  # async def initialiseSong(self, ctx, url, client):
+  #   print("Going to initialise song")
+  #   FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+  #   YDL_OPTIONS = {'format': 'bestaudio', 'forceduration': True}
+
+  #   with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+  #     info = ydl.extract_info(url, download = False)
+  #     url2 = info['formats'][0]['url']
+  #     source = await discord.FFmpegOpusAudio.from_probe(url2,**FFMPEG_OPTIONS)
+  #     return Song(ctx, url, client, source, info['duration'])
+###########################
+
+  # async def playPreviousSong(self, ctx, client):
+  #   print("######### Previous Song Function Called ##############")
+  #   if (self.previousSong != None):
+  #     currentSong = self.getCurrentSong()
+  #     print("######### Current Song ##############")
+  #     if currentSong != None:
+  #       currentSong.stopPlaying()
+  #       print("######### Current Song Stopped ##############")
+  #       currentSong.songState = Song.SongState.NOT_STARTED
+      
+  #     print("######### Going to initialise previous song ##############")
+  #     print(self.previousSong.url)
+  #     self.previousSong = await self.initialiseSong(ctx, self.previousSong.url, client)
+  #     print("######### Previous Song initialised ##############")
+      
+  #     print(self.previousSong.songState)
+  #     #self.previousSong.songState = self.previousSong.NOT_STARTED
+  #     print("######### Previous Song State Set To NOT STARTED ##############")
+  #     self.songQueue.insert(0, self.previousSong)
+  #     self.previousSong = None
+    #     print( "Playing Previous Song")
+  #   else:
+  #     print("Previous Song Not Found")
+
+  def playPreviousSong(self, previousSong, currentSong):
+    if (previousSong != None):
+      currentSongPlaying = self.getCurrentSong()
+      if currentSongPlaying != None:
+        currentSongPlaying.stopPlaying()
+      previousSong.songState = Song.SongState.NOT_STARTED
+      self.songQueue.insert(0, previousSong)
       if currentSong != None:
-        currentSong.stopPlaying()
-        currentSong.songState = Song.SongState.NOT_STARTED
-      self.previousSong.songState = Song.SongState.NOT_STARTED
-      self.songQueue.insert(0, self.previousSong)
+        print("Stopping currently playing song: ", currentSong)
+        self.songQueue[1] = currentSong
       self.previousSong = None
       print( "Playing Previous Song")
     else:
@@ -85,11 +130,10 @@ class Scheduler(Thread):
     if timeLapsed >= song.remainingTime:
       currentSong = self.songQueue[0];
       song.stopPlaying()
-      self.songQueue.pop(0)
       self.previousSong = currentSong
 
   def getCurrentSong(self):
-    if (len(self.songQueue) >= 0):
+    if (len(self.songQueue) > 0):
       return self.songQueue[0]
     return None
 
@@ -98,6 +142,8 @@ class Scheduler(Thread):
   def run(self):
     while True:
       song = self.getSongFromQueue()
+      if song.songState == Song.SongState.END:
+        self.songQueue.pop(0)
       print("Found song with state: ", song.songState)
       while (song.songState != Song.SongState.END):
         if (song.songState == Song.SongState.NOT_STARTED):
@@ -105,6 +151,8 @@ class Scheduler(Thread):
         if (song.songState == Song.SongState.PLAYING):
           self.checkForSongEnd(song)
         time.sleep(2)
+
+      
         
         
 

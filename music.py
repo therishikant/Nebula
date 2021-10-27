@@ -1,4 +1,5 @@
 
+
 from discord.ext import commands
 
 import youtube_dl
@@ -62,11 +63,24 @@ class music(commands.Cog):
       await ctx.send("Next Song▶️")
     else:
       await ctx.send("There is no song in the queue.")
+  
+  @commands.command()
+  async def suffle(self, ctx):
+    if self.scheduler != None:
+      self.scheduler.shuffleQueue()
+      await ctx.send("Song Suffled▶️")
+    else:
+      await ctx.send("There is no song in the queue.")
 
   @commands.command()
   async def previous(self, ctx):
-    if self.scheduler != None:
-      self.scheduler.playPreviousSong()
+    if self.scheduler != None and self.scheduler.getPreviousSong() != None:
+      prevSong = await self.initialiseSong(ctx, self.scheduler.getPreviousSong().url)
+      currentSongObject = self.scheduler.getCurrentSong()
+      currentSong = None
+      if currentSongObject != None: 
+        currentSong = await self.initialiseSong(ctx, self.scheduler.getCurrentSong().url)
+      self.scheduler.playPreviousSong(prevSong, currentSong)
       await ctx.send("Previous Song▶️")
     else:
       await ctx.send("There is no song in the queue.")
