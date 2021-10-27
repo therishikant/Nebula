@@ -65,7 +65,7 @@ class music(commands.Cog):
       await ctx.send("There is no song in the queue.")
   
   @commands.command()
-  async def suffle(self, ctx):
+  async def shuffle(self, ctx):
     if self.scheduler != None:
       self.scheduler.shuffleQueue()
       await ctx.send("Song Suffled▶️")

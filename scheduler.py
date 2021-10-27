@@ -1,7 +1,7 @@
 from song import Song
 from threading import Thread
 
-
+import random
 
 import time
 
@@ -24,8 +24,13 @@ class Scheduler(Thread):
   def addToQueue(self, song):
     self.songQueue.append(song)
 
-  def shuffleQueue():
-    pass
+  def shuffleQueue(self):
+    newSongList = self.songQueue.copy()
+    newSongList.pop(0)
+    random.shuffle(newSongList)
+    self.songQueue = self.songQueue[:1]
+    self.songQueue.extend(newSongList)
+
 
   def getPreviousSong(self):
     return self.previousSong
