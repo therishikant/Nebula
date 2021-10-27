@@ -1,8 +1,4 @@
 import time
-import youtube_dl
-import discord
-
-
 
 class Song:
 
@@ -14,11 +10,15 @@ class Song:
 
   isLooped = False;
 
-  def __init__(self, ctx, url, client):
+  def __init__(self, ctx, url, client, source, duration):
     self.ctx = ctx
     self.url = url
     self.client = client
     self.songState = self.SongState.NOT_STARTED
+    self.source = source
+    self.duration = duration
+    self.remainingTime = duration
+    print("Song with url: ", self.url, " initialised")
 
   def pausePlaying(self):
     self.ctx.voice_client.pause()
@@ -32,7 +32,6 @@ class Song:
     self.songState = self.SongState.PLAYING
 
   def startPlaying(self):
-    init
     vc = self.ctx.voice_client
     vc.play(self.source)
     self.remainingTime = self.duration
@@ -49,18 +48,6 @@ class Song:
 
   def getDuration(self):
     return self.duration
-
-  def initialiseSong(self, url, ctx):
-    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-    YDL_OPTIONS = {'format': 'bestaudio', 'forceduration': True}
-
-    with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
-      info = ydl.extract_info(url, download = False)
-      url2 = info['formats'][0]['url']
-      source = await discord.FFmpegOpusAudio.from_probe(url2,**FFMPEG_OPTIONS)
-      self.source = source
-      self.duration = duration
-      self.remainingTime = duration
 
   def reduceDurationTime(self, secondsToReduce):
     self.remainingTime = self.remainingTime - secondsToReduce
