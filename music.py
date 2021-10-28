@@ -1,13 +1,11 @@
-
-
 from discord.ext import commands
-
 import youtube_dl
 import discord
-
+import validators
 
 from song import Song
 from scheduler import Scheduler
+from url_fetcher import UrlFetcher
 
 class music(commands.Cog):
 
@@ -25,6 +23,12 @@ class music(commands.Cog):
       url2 = info['formats'][0]['url']
       source = await discord.FFmpegOpusAudio.from_probe(url2,**FFMPEG_OPTIONS)
       return Song(ctx, url, self.client, source, info['duration'])
+
+  def getURL(self, searchTerm):
+    if validators.url(searchTerm):
+      return searchTerm
+    return UrlFetcher.getUrl(searchTerm)
+    
 
   @commands.command()
   async def j(self, ctx):
@@ -87,9 +91,10 @@ class music(commands.Cog):
 
   @commands.command()
   async def p(self,ctx,url):
+    url = self.getURL(url)
     print("Received request to play a song")
     if self.scheduler == None:
-      print("Scheduler is unavialabel creating a anew one")
+      print("Scheduler is unavailable creating a new one")
       self.scheduler = Scheduler(ctx)
       self.scheduler.start()
 
@@ -107,8 +112,8 @@ class music(commands.Cog):
     print("Song initalised")
     self.scheduler.addToQueue(song)
 
-    print("There is/are now"+ str(self.scheduler.getQueueLength()) +" song(s) in the queue to be paused")
-    await ctx.send("There is/are now"+ str(self.scheduler.getQueueLength()) +" song(s) in the queue to be paused")
+    print("There is/are now "+ str(self.scheduler.getQueueLength()) +" song(s) in the queue to be paused")
+    await ctx.send("There is/are now "+ str(self.scheduler.getQueueLength()) +" song(s) in the queue to be paused")
       
       
     
