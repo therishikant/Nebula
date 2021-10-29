@@ -47,6 +47,7 @@ class Scheduler(Thread):
         self.songQueue[1] = currentSong
       self.previousSong = None
       print( "Playing Previous Song")
+      return self.songQueue[0].url
     else:
       print("Previous Song Not Found")
     
@@ -57,6 +58,7 @@ class Scheduler(Thread):
     currentSong.stopPlaying();
     self.songQueue.pop(0)
     print("playing next song")
+    return self.songQueue[0].url
 
   def pauseSong(self):
     print("pausing song")
@@ -93,7 +95,6 @@ class Scheduler(Thread):
     return None
 
 
-
   def run(self):
     while True:
       song = self.getSongFromQueue()
@@ -103,6 +104,7 @@ class Scheduler(Thread):
       while (song.songState != Song.SongState.END):
         if (song.songState == Song.SongState.NOT_STARTED):
           song.startPlaying()
+
         if (song.songState == Song.SongState.PLAYING):
           self.checkForSongEnd(song)
         time.sleep(2)

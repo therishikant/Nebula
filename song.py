@@ -37,6 +37,7 @@ class Song:
     self.remainingTime = self.duration
     self.songState = self.SongState.PLAYING
     self.startTimeSeconds = time.time()
+    
 
   def stopPlaying(self):
     self.ctx.voice_client.stop()

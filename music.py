@@ -50,23 +50,23 @@ class music(commands.Cog):
       self.scheduler.pauseSong()
       await ctx.send("Paused ⏸")
     else:
-      await ctx.send("There is no song in the queue to be paused")
+      await ctx.send("There is no song in the queue")
 
   @commands.command()
   async def resume(self, ctx):
     if self.scheduler != None:
       self.scheduler.resumeSong()
-      await ctx.send("resumed ▶️")
+      await ctx.send("Resumed ▶️")
     else:
-      await ctx.send("There is no song in the queue to be paused")
+      await ctx.send("There is no song in the queue")
   
   @commands.command()
   async def next(self, ctx):
     if self.scheduler != None:
-      self.scheduler.playNextSong()
-      await ctx.send("Next Song▶️")
+      nextSongUrl = self.scheduler.playNextSong()
+      await ctx.send("Now Playing " + nextSongUrl)
     else:
-      await ctx.send("There is no song in the queue.")
+      await ctx.send("There is no song in the queue")
   
   @commands.command()
   async def shuffle(self, ctx):
@@ -74,7 +74,7 @@ class music(commands.Cog):
       self.scheduler.shuffleQueue()
       await ctx.send("Song Suffled▶️")
     else:
-      await ctx.send("There is no song in the queue.")
+      await ctx.send("There is no song in the queue")
 
   @commands.command()
   async def previous(self, ctx):
@@ -84,13 +84,13 @@ class music(commands.Cog):
       currentSong = None
       if currentSongObject != None: 
         currentSong = await self.initialiseSong(ctx, self.scheduler.getCurrentSong().url)
-      self.scheduler.playPreviousSong(prevSong, currentSong)
-      await ctx.send("Previous Song▶️")
+      nextSongUrl = self.scheduler.playPreviousSong(prevSong, currentSong)
+      await ctx.send("Now Playing " + nextSongUrl)
     else:
-      await ctx.send("There is no song in the queue.")
+      await ctx.send("There is no song in the queue")
 
   @commands.command()
-  async def p(self,ctx,url):
+  async def p(self,ctx, * , url):
     url = self.getURL(url)
     print("Received request to play a song")
     if self.scheduler == None:
@@ -109,15 +109,13 @@ class music(commands.Cog):
 
     #ctx.voice_client.stop()
     song = await self.initialiseSong(ctx, url)
-    print("Song initalised")
+    print("Song Initalised")
     self.scheduler.addToQueue(song)
 
-    print("There is/are now "+ str(self.scheduler.getQueueLength()) +" song(s) in the queue to be paused")
-    await ctx.send("There is/are now "+ str(self.scheduler.getQueueLength()) +" song(s) in the queue to be paused")
+    print("There is/are now "+ str(self.scheduler.getQueueLength()) +" song(s) in the queue")
+    await ctx.send("There is/are now "+ str(self.scheduler.getQueueLength()) +" song(s) in the queue")
       
       
     
 def setup(client):
   client.add_cog(music(client))
-    
-  
